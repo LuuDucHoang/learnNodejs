@@ -10,4 +10,8 @@ router.get('/', homeController.getHomePage)
 
 //     res.send(`<h2>Hello</h2>`)
 // })
+router.post('/users', homeController.userPage)
+router.get('/list', homeController.listUser)
+router.get('/create', homeController.createPage)
+router.get('/update/:userid', homeController.updatePage)
 module.exports = router
