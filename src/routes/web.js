@@ -13,5 +13,8 @@ router.get('/', homeController.getHomePage)
 router.post('/users', homeController.userPage)
 router.get('/list', homeController.listUser)
 router.get('/create', homeController.createPage)
+router.post('/update-user', homeController.updateUsers)
 router.get('/update/:userid', homeController.updatePage)
+router.post('/delete-ueser/:userid', homeController.postDeleteUser)
+router.post('/delete-user', homeController.confirmDelete)
 module.exports = router
