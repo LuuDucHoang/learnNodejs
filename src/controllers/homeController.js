@@ -1,5 +1,6 @@
 const { connection } = require('../config/database')
 const services = require('../services/CRUDservices')
+const mongoose = require('mongoose');
 const User = require('../models/user')
 const getHomePage = (req, res) => {
     return res.render('home.ejs')
@@ -8,20 +9,21 @@ const createPage = async (req, res) => {
     return res.render('createUser.ejs')
 }
 const listUser = async (req, res) => {
-    const results = []
-
+    const results = await User.find({});
     return res.render('listUsers.ejs', { data: results })
-
 
 }
 const updatePage = async (req, res) => {
     const userid = req.params.userid;
-    const results = await services.getUserById(userid)
+    const results = await User.find({ _id: userid })
     return res.render('edit.ejs', { data: results[0] })
 }
+
+
 const updateUsers = async (req, res) => {
     const { id, name, email, city } = req.body
-    await services.updateUserByID(email, name, city, id)
+    console.log(id)
+    await User.updateOne({ _id: id }, { name, email, city })
     res.redirect('/list')
 }
 
@@ -42,14 +44,13 @@ const userPage = async (req, res) => {
 
 const postDeleteUser = async (req, res) => {
     const userid = req.params.userid;
-    const results = await services.getUserById(userid)
-    return res.render('delete.ejs', { data: results[0] })
+    const results = await User.findById(userid)
+    return res.render('delete.ejs', { data: results })
 
 }
 const confirmDelete = async (req, res) => {
-    console.log(req.body)
     const { id, email } = req.body
-    await services.deleteUserById(id)
+    await User.deleteOne({ _id: id }).exec()
     res.redirect('/list')
 }
 module.exports = {
