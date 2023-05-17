@@ -11,9 +11,19 @@ const hostName = process.env.HOST_NAME
 app.use(express.json()); // Used to parse JSON bodies
 app.use(express.urlencoded()); //Parse URL-encoded bodies
 
+//test
 
 configViewEngine(app)
 app.use('/', webRouter)
-app.listen(port, hostName, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    ; (async () => {
+        try {
+            await connection();
+            app.listen(port, hostName, () => {
+                console.log(`Backendapp listening on port ${port}`)
+            })
+        }
+        catch (error) {
+            console.log(error)
+        }
+    })()
+
