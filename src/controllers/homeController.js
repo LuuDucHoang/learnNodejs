@@ -117,8 +117,8 @@ const login = async (req, res) => {
 const action = async (req, res) => {
     const { temp } = req.body
     try {
-        sql2.query(connectionString, `select * from dbo.Action where ${+temp} > temperatureFrom and ${+temp} <= temperatureTo `, (err, rows) => {
-            if ( rows && rows.length > 0) {
+        sql2.query(connectionString, `select * from dbo.Action2 where ${+temp} > temperatureFrom and ${+temp} <= temperatureTo `, (err, rows) => {
+            if (rows && rows.length > 0) {
                 return res.status(200).send({
                     code: 200,
                     message: 'Thành công',
@@ -139,6 +139,160 @@ const action = async (req, res) => {
         })
     }
 
+}
+const getUserAction = async (req, res) => {
+    const { username } = req.body
+    try {
+        sql2.query(connectionString, `select * from dbo.Action2 where username = '${username}' `, (err, rows) => {
+            if (rows) {
+                return res.status(200).send({
+                    code: 200,
+                    message: 'Thành công',
+                    items: rows
+                })
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            code: 500,
+            message: error,
+        })
+    }
+
+}
+const getUserActionDetail = async (req, res) => {
+    const { username, code } = req.body
+    try {
+        sql2.query(connectionString, `select * from dbo.Action2 where username = '${username}' and code ='${code}' `, (err, rows) => {
+            if (rows) {
+                return res.status(200).send({
+                    code: 200,
+                    message: 'Thành công',
+                    items: rows[0]
+                })
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            code: 500,
+            message: error,
+        })
+    }
+
+}
+const insertUserAction = async (req, res) => {
+    const { username, temperatureFrom, temperatureTo, code, action } = req.body
+    try {
+        sql2.query(connectionString, `select * from dbo.Action2 where username = '${username}' and action ='${action}' `, (err, rows) => {
+            if (rows && rows.length > 0) {
+                return res.status(422).send({
+                    code: 422,
+                    message: 'Đã tồn tại hoạt động',
+                })
+            }
+            if (username && temperatureFrom && temperatureTo && code) {
+                sql2.query(connectionString, `insert into dbo.Action2(username, temperatureFrom, temperatureTo, code, action)
+                values ('${username}', '${temperatureFrom}', '${temperatureTo}', '${code}', '${action}')
+            `)
+                return res.status(200).send({
+                    code: 200,
+                    message: 'Thêm mới thành công',
+                })
+            }
+            else {
+                return res.status(422).send({
+                    code: 422,
+                    message: 'Nhập đủ thông tin',
+                })
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            code: 500,
+            message: error,
+        })
+    }
+
+}
+
+
+const updateUserAction = async (req, res) => {
+    const { username, temperatureFrom, temperatureTo, code, action } = req.body
+    try {
+        sql2.query(connectionString, `select * from dbo.Action2 where username = '${username}' and code ='${code}' `, (err, rows) => {
+            if (rows && rows.length > 0) {
+                if (username && temperatureFrom && temperatureTo && code) {
+                    sql2.query(connectionString, `update dbo.Action2
+                    set action = '${action}', temperatureFrom='${temperatureFrom}', temperatureTo='${temperatureTo}'
+                    where code = '${code}' and username ='${username}'
+                    `, (err, rows) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                    })
+                    return res.status(200).send({
+                        code: 200,
+                        message: 'Cập nhật thành công',
+                    })
+                }
+                else {
+                    return res.status(422).send({
+                        code: 422,
+                        message: 'Nhập đủ thông tin',
+                    })
+                }
+            }
+            return res.status(422).send({
+                code: 422,
+                message: 'Hoạt động không tồn tại',
+            })
+
+        })
+    } catch (error) {
+        return res.status(500).send({
+            code: 500,
+            message: error,
+        })
+    }
+
+}
+
+const deleteUserAction = async (req, res) => {
+    const { username, temperatureFrom, temperatureTo, code, action } = req.body
+    try {
+        sql2.query(connectionString, `select * from dbo.Action2 where username = '${username}' and code ='${code}' `, (err, rows) => {
+            if (rows && rows.length > 0) {
+                if (username && code) {
+                    sql2.query(connectionString, `DELETE FROM dbo.Action2 where code = '${code}' and username ='${username}'
+                    `, (err, rows) => {
+                        if (err) {
+                            console.log(err)
+                        }
+                    })
+                    return res.status(200).send({
+                        code: 200,
+                        message: 'Xóa thành công',
+                    })
+                }
+                else {
+                    return res.status(422).send({
+                        code: 422,
+                        message: 'Nhập đủ thông tin',
+                    })
+                }
+            }
+            return res.status(422).send({
+                code: 422,
+                message: 'Hoạt động không tồn tại',
+            })
+
+        })
+    } catch (error) {
+        return res.status(500).send({
+            code: 500,
+            message: error,
+        })
+    }
 
 }
 const listUser = async (req, res) => {
@@ -166,5 +320,10 @@ const confirmDelete = async (req, res) => {
 }
 module.exports = {
     getHomePage, userPage, listUser, createUser, updatePage, updateUsers, postDeleteUser, confirmDelete,
-    login, action
+    login, action,
+    getUserAction,
+    insertUserAction, updateUserAction,
+    deleteUserAction,
+    getUserActionDetail
+
 }
