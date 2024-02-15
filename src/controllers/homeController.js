@@ -115,9 +115,9 @@ const login = async (req, res) => {
 }
 
 const action = async (req, res) => {
-    const { temp } = req.body
+    const { temp, username } = req.body
     try {
-        sql2.query(connectionString, `select * from dbo.Action2 where ${+temp} > temperatureFrom and ${+temp} <= temperatureTo `, (err, rows) => {
+        sql2.query(connectionString, `select * from dbo.Action2 where username ='${username}' and ${+temp} > temperatureFrom and ${+temp} <= temperatureTo `, (err, rows) => {
             if (rows && rows.length > 0) {
                 return res.status(200).send({
                     code: 200,
